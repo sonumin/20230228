@@ -3,12 +3,15 @@ import { View,Text, StyleSheet, Button, ActionSheetIOS, Image, Pressable } from 
 import { useMutation, useQuery } from '@tanstack/react-query'
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 import axios from 'axios';
 
 const DetailScreen = () =>{
+    const navigation = useNavigation();
     const [foodImg, setFoodImg] = useState();
-    const [foodData, setFoodData] = useState([]);
+    const [foodData, setFoodData] = useState();
+    const [jsonData, setJsonData] = useState();
     const openCamera = async () =>{
         const result = await launchCamera()
         console.log(result)
@@ -29,18 +32,33 @@ const DetailScreen = () =>{
             name: 'test',
         }
         fd.append('file', data);
-        axios.post('http://192.168.0.166:50011/predict', fd, {
+        axios.post('http://121.174.150.180:50001/predict', fd, {
             headers: {
               'content-type': 'multipart/form-data',
             }, 
             responseType: 'json'
         })
         .then((res) => {
+            const arr = []
+            for(let i = 0; i < res.data.length - 1; i++){
+                arr[i] = res.data[i+1]
+            }
+            setJsonData(res.data)
             setFoodImg(`data:image/jpeg;base64,${res.data[0].image_data}`)
+            setFoodData(arr)
         })
         .catch((err) => {
             Alert.alert('인식하지 못했어요!')
         });
+    }
+    const saveResult = async () => {
+        await axios
+        .post('http://121.174.150.180:50001/save',JSON.stringify(jsonData),{
+          headers: {
+            'content-type': 'application/json',
+          },
+          responseType: 'json'
+        })
     }
     const actionSheet = () =>{
         ActionSheetIOS.showActionSheetWithOptions(
@@ -56,6 +74,9 @@ const DetailScreen = () =>{
               }
             },
         )
+    }
+    const toHomeScreen =() => {
+        navigation.navigate("Home")
     }
     return(
         <View style={styles.screen}>
@@ -77,7 +98,7 @@ const DetailScreen = () =>{
                 <Pressable style={styles.button} onPress={sendImg}>
                     <Icon name="send" size={24} color="#ffffff" />
                 </Pressable>
-                <Pressable style={styles.button}>
+                <Pressable style={styles.button} onPress={()=>{toHomeScreen()}}>
                     <Icon name="save" size={24} color="#ffffff" />
                 </Pressable>
             </View>

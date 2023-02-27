@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, QueryCache } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View,Text, StyleSheet, Button, Dimensions, ScrollView } from 'react-native';
@@ -18,10 +18,11 @@ const HomeScreen = () =>{
     const [persentData, setPersentData] = useState();
 
     const {isSuccess, data} = useQuery(['weekData'],  () => {
-        return fetch('http://192.168.0.166:50011/loadWeekData').then((res)=> res.json())
+        return fetch('http://121.174.150.180:50001/loadWeekData').then((res)=> res.json())
+        // return axios.get('http://123.190.90.18:50011/loadWeekData').then((res)=> res.json())
     });
     const userData = useQuery(['userData'], () => {
-        return fetch('http://192.168.0.166:50011/loadUserData').then((res)=> res.json())
+        return fetch('http://121.174.150.180:50001/loadUserData').then((res)=> res.json())
     });
     const convertWeek = () =>{
         if(isSuccess){
@@ -50,15 +51,22 @@ const HomeScreen = () =>{
         }
     },[data])
     useEffect(()=>{
+        // console.log(userData)
+
         if(userData && weekData && !persentData){
             convertPersent();
         }
     },[userData])
-    // useEffect(()=>{
-    //     if(!persentData){
-    //     }
-    // },[persentArray])
 
+    const queryCache = new QueryCache({
+        onError: error => {
+          console.log(error)
+        },
+        onSuccess: data => {
+          console.log(data)
+        }
+    })
+    const query = queryCache.find({ queryKey: ['userData'] })
     return(
         <View style={styles.screen}>
             {persentData&&weekData&&

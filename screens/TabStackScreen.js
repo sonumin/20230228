@@ -6,6 +6,7 @@ import DetailScreen from './DetailScreen';
 import HomeScreen from './HomeScreen';
 import SettingScreen from './SettingScreen';
 import EditUserScreen from './EditUserScreen';
+import LoginScreen from './LoginScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 Ionicons.loadFont()
 
@@ -16,7 +17,7 @@ const SettingStack = createStackNavigator();
 const HomeName="메인화면"
 const DetailName="사진"
 const SettingName="내정보"
-
+const LoginName="로그인"
 
 const HomeStackScreen=()=>{
     return(
@@ -68,6 +69,7 @@ const TabStackScreen = () =>{
             }}
         >
             <TabStack.Screen name={HomeName} component = {HomeStackScreen} />
+            <TabStack.Screen name={LoginName} component = {LoginScreen} />
             <TabStack.Screen name ={DetailName} component = {DetailStackScreen} />
             <TabStack.Screen name ={SettingName} component = {SettingStackScreen}/> 
         </TabStack.Navigator>

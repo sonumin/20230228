@@ -1,30 +1,34 @@
 import { React, useState, useEffect} from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
-import { View,Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View,Text, StyleSheet, Image, TouchableOpacity, ActionSheetIOS, Button } from 'react-native';
 import axios from 'axios';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const SettingScreen = (route) =>{
+const SettingScreen = () =>{
+    const userID = AsyncStorage.getItem('userId').then((res) => res)
     const imgArray = []
-    const userData = useQuery(['userData'], () => {
-        return fetch('http://192.168.0.166:50011/loadUserData').then((res)=> res.json())
+    const imagesData= useQuery(['image'], () => {
+        return fetch(`http://121.174.150.180:50001/loadNineImages?id=${userID}`).then((res)=>  res.json())
     });
-    const imagesData = useQuery(['imageData'], () => {
-        return fetch('http://192.168.0.166:50011/load9Images').then((res)=> res.json())
+    const userData = useQuery(['userData'], () => {
+        return fetch('http://121.174.150.180:50001/loadUserData').then((res)=> res.json())
     });
     const [userProfile, setUserProfile] = useState();
     const [profileImg, setProfileImg] = useState();
     const [nineImages, setNineImages] = useState();
-    // useEffect(()=>{
-    //     console.log(result)
-    // },[result])
     const divideImages = () =>{
         if(imagesData.data !== undefined){
             for(let i = 0; i < 9; i++){
-                imgArray[i] = imagesData.data[i]['image_data']
+                if(imagesData.data[i]['image_data'] !== undefined){
+                    imgArray[i] = imagesData.data[i]['image_data']
+                }
+                else{
+                    imgArray[i] = ' '
+                }
             }
             setNineImages(imgArray)
         }
@@ -36,9 +40,11 @@ const SettingScreen = (route) =>{
     },[userData])
     useEffect(()=>{
         if((imagesData.data !== undefined)&&!nineImages){
-            divideImages()
+            console.log(imagesData)
+            // divideImages()
         }
     },[imagesData])
+    
     const NineImages = () => {
     
         return(
@@ -62,7 +68,21 @@ const SettingScreen = (route) =>{
             </View>
         );
     }
-
+    const actionSheet = () =>{
+        ActionSheetIOS.showActionSheetWithOptions(
+            {
+              options: ["카메라로 촬영하기", "사진 선택하기", "취소"],
+              cancelButtonIndex: 2,
+            },
+            (buttonIndex) => {
+              if (buttonIndex === 0) {
+                openCamera();
+              } else if (buttonIndex === 1) {
+                showImagePicker();
+              }
+            },
+        )
+    }
     const openCamera = async () =>{
         const result = await launchCamera()
         console.log(result)
@@ -85,23 +105,23 @@ const SettingScreen = (route) =>{
             <View style={styles.firstContainer}>
                 <View style={styles.profileContainer}>
                     <View style={styles.profile}>
-                        {/* <Image style={styles.profileImage} source={{uri:`data:image/jpeg;base64,${' '}`}}> */}
-                        <Image style={styles.profileImage} source={require('/Users/jongsik2/Desktop/RN/RN_food/egg-bread.png')}>
-
-                        </Image>
+                        <TouchableOpacity style={styles.profileImageContainer} onPress={actionSheet}>
+                            {profileImg&&<Image style={styles.profileImage}source={{ uri: profileImg }}/>}
+                        </TouchableOpacity>
                         <View style={styles.profileName}>
+                            <Text style={styles.userLable}>안녕하세요 {userProfile['name']}님!</Text>
                             <TouchableOpacity style={styles.button} onPress={toSettingScreen}>
                                 <Icon name="settings-outline" size={24} color="#000000" />
                             </TouchableOpacity>
-                            <Text>{userProfile['name']}</Text>
                         </View>
                     </View>
-                <View style={styles.goalContainer}>
-                    <Text>{userProfile['kcal']}</Text>
-                    <Text>{userProfile['carbo']}</Text>
-                    <Text>{userProfile['province']}</Text>
-                    <Text>{userProfile['protein']}</Text>
-                </View>
+                    <View style={styles.goalContainer}>
+                        <Text style={styles.goalText}>키 : {userProfile['height']}  몸무게 : {userProfile['weight']}</Text>
+                        <Text style={styles.goalText}></Text>
+                        <Text style={styles.goalText}>목표 칼로리 : {userProfile['kcal']}</Text>
+                        <Text style={styles.goalText}>목표 탄수화물 : {userProfile['carbo']}  목표지방 : {userProfile['province']}</Text>
+                        <Text style={styles.goalText}>목표 단백질 : {userProfile['protein']}</Text>
+                    </View>
                 </View>
             </View>
             <View style={styles.history}>
@@ -145,25 +165,42 @@ const styles=StyleSheet.create({
         height:'50%',
         flexDirection:'row'
     },
-    profileImage:{
+    profileImageContainer:{
         width:'35%',
-        height:'100%',
+        height:'90%',
         alignItems:'center',
         justifyContent:'center',
-        flexDirection:'row'
+        flexDirection:'row',
+        padding:'2%'
+    },
+    profileImage:{
+        marginTop:'15%',
+        width:'100%',
+        height:'100%',
+        resizeMode:'cover',
+        borderRadius:70,
     },
     profileName:{
         width:'65%',
         height:'100%',
         alignItems:'center',
-        justifyContent:'center',
         flexDirection:'row'
+    },
+    userLable:{
+        width:'85%',
+        height:'30%',
+        marginTop:'5%',
+        marginLeft:'5%',    
+        fontSize:23,
     },
     goalContainer:{
         width:'100%',
         height:'50%',
-        alignItems:'center',
-        justifyContent:'center',
+        justifyContent:'space-around',
+        padding:'5%'
+    },
+    goalText:{
+        fontSize:17
     },
     history:{
         width: '90%',
