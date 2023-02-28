@@ -10,6 +10,7 @@ import {
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import AppStackScreen from './screens/TabStackScreen';
 
 const queryClient = new QueryClient()
 
@@ -17,7 +18,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
-        <TabStackScreen/>
+        <AppStackScreen/>
       </NavigationContainer>
     </QueryClientProvider>
   );

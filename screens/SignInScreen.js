@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
     StyleSheet,
@@ -11,49 +12,43 @@ import {
     KeyboardAvoidingView,
     Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const LoginScreen = () =>{
-    const tosignInScreen =() => {
-        navigation.navigate("SignIn")
-    }
-    const toHome =() => {
-        navigation.navigate("Main")
-    }
-    const navigation = useNavigation();
+const SignInScreen = () => {
+    const navigation = useNavigation('');
     const [id,setId] = useState('');
     const [password,setPassword] = useState('');
-    const [isFilled, setIsFilled] = useState(false);
-    const login = () =>{
-        if(!id || !password){
-            if(!id){
-                Alert.alert('아이디를 입력해 주세요')
-            }else{
-                Alert.alert('비밀번호를 입력해 주세요')
-            }
-        }else{
-            setIsFilled(true)
-        }
-        if(isFilled){
-            axios.post('http://121.174.150.180:50001/login', {
-                id: id,
-                password: password
-            })
-            .then((response) => {
-                if(response.data['status'] === 'success'){
-                    AsyncStorage.setItem('userId', id)
-                    navigation.navigate('Home')
-                }else{
-                    Alert.alert('로그인 실패')
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-        }
+    const navitoEdit=()=>{
+        navigation.navigate('Firstset')
     }
+    // const [isRegistraionSuccess,setIsRegistraionSuccess] = useState(0);
+    //     if(isRegistraionSuccess==1){
+    //         return (
+    //         <View
+    //             style={{
+    //             flex: 1,
+    //             backgroundColor: '#307ecc',
+    //             justifyContent: 'center',
+    //             }}>
+    //             <Image
+    //             source={require('/Users/haesu/Desktop/rrrrrrr/RN_food/kakao.png')}
+    //             style={{
+    //                 height: 150,
+    //                 resizeMode: 'contain',
+    //                 alignSelf: 'center'
+    //             }}
+    //             />
+    //             <Text style={styles.successTextStyle}>
+    //             Registration Successful
+    //             </Text>
+    //             <TouchableOpacity
+    //             style={styles.buttonStyle}
+    //             activeOpacity={0.5}
+    //             onPress={''}>
+    //             <Text style={styles.buttonTextStyle}>Login Now</Text>
+    //             </TouchableOpacity>
+    //         </View>
+    //         );
+    //     }
+    
     return(
         <View style={styles.screen}>
         {/* <Loader loading={loading} /> */}
@@ -95,6 +90,9 @@ const LoginScreen = () =>{
                                 underlineColorAndroid="#f000"
                                 blurOnSubmit={false}
                             />
+                            {/* <TouchableOpacity style={{justifyContent:'center',marginLeft:'2%'}}>
+                                <Text>중복확인</Text>
+                            </TouchableOpacity> */}
                         </View>
                         <View style={styles.SectionStyle}>
                             <TextInput
@@ -113,36 +111,22 @@ const LoginScreen = () =>{
                                 returnKeyType="next"
                             />
                         </View>
-                        {/* {errortext != '' ? (
-                        <Text style={styles.errorTextStyle}>
-                            {errortext}
-                        </Text>
-                        ) : null} */}
                         <TouchableOpacity
                             style={styles.buttonStyle}
                             activeOpacity={0.5}
-                            // onPress={login}
-                            onPress={toHome}
+                            onPress={navitoEdit}
                         >
-                            <Text style={styles.buttonTextStyle}>LOGIN</Text>   
+                            <Text style={styles.buttonTextStyle}>Next</Text>   
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.kakaobutton}
-                            activeOpacity={0.5}
-                        >
-                            <Image source={require('/Users/haesu/Desktop/rrrrrrr/RN_food/kakao.png')} style={{width:22,height:20,resizemode:'contain',marginRight:20}}/>
-                            <Text style={styles.kakaoTextStyle}>Login with Kakao</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.registerTextStyle} onPress={ tosignInScreen}>
-                            New Here ? Register
-                        </Text>
-                    </KeyboardAvoidingView>
+                        </KeyboardAvoidingView>
                 </View>
 
             </ScrollView>
         </View>
-    )
+    );
 }
+
+export default SignInScreen;
 
 const styles=StyleSheet.create({
     screen:{
@@ -217,6 +201,10 @@ const styles=StyleSheet.create({
         textAlign: 'center',
         fontSize: 14,
     },
+    successTextStyle: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 18,
+        padding: 30,
+      },
 })
-
-export default LoginScreen;
