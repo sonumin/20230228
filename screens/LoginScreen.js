@@ -44,7 +44,7 @@ const LoginScreen = () =>{
             .then((response) => {
                 if(response.data['status'] === 'success'){
                     AsyncStorage.setItem('userId', id)
-                    navigation.navigate('Home')
+                    navigation.navigate('Main')
                 }else{
                     Alert.alert('로그인 실패')
                 }

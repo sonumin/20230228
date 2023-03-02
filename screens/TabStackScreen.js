@@ -10,7 +10,7 @@ import LoginScreen from './LoginScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SignInScreen from './SignInScreen';
 import FirstsetScreen from './FirstsetScreen';
-// Ionicons.loadFont()
+Ionicons.loadFont()
 
 const TabStack = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
