@@ -15,6 +15,18 @@ import AppStackScreen from './screens/TabStackScreen';
 const queryClient = new QueryClient()
 
 const App = () => {
+  const [load,setload] = useState(false);
+  setTimeout(()=>{
+    setload(true)
+  },5000)
+  if(load==false){
+    return(
+      <View style={styles.mainContainer}>
+        <Text> ㅎㅇㅎㅇㅎㅇ</Text>
+      </View>
+    )
+  }
+  else{
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
@@ -22,6 +34,7 @@ const App = () => {
       </NavigationContainer>
     </QueryClientProvider>
   );
+  }
 };
 
 const styles = StyleSheet.create({

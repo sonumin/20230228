@@ -10,6 +10,7 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     Alert,
+    Dimensions
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
@@ -22,10 +23,17 @@ const LoginScreen = () =>{
     const toHome =() => {
         navigation.navigate("Main")
     }
+    const asynclogin =()=>{
+        AsyncStorage.setItem('login','false', () => {
+            console.log('로그인저장완료!')
+        }
+        );
+    }
     const navigation = useNavigation();
     const [id,setId] = useState('');
     const [password,setPassword] = useState('');
     const [isFilled, setIsFilled] = useState(false);
+    const [islogin,setIslogin] = useState(false);
     const login = () =>{
         if(!id || !password){
             if(!id){
@@ -68,7 +76,7 @@ const LoginScreen = () =>{
                     <KeyboardAvoidingView enabled>
                         <View style={{alignItems: 'center'}}>
                             <Image
-                                source={require('/Users/haesu/Desktop/rrrrrrr/RN_food/egg-bread.png')}
+                                source={require('/Users/haesu/Desktop/capston_food/20230228/egg-bread.png')}
                                 style={{
                                     width: '50%',
                                     height: 100,
@@ -129,8 +137,9 @@ const LoginScreen = () =>{
                         <TouchableOpacity
                             style={styles.kakaobutton}
                             activeOpacity={0.5}
+                            onPress={asynclogin}
                         >
-                            <Image source={require('/Users/haesu/Desktop/rrrrrrr/RN_food/kakao.png')} style={{width:22,height:20,resizemode:'contain',marginRight:20}}/>
+                            <Image source={require('/Users/haesu/Desktop/capston_food/20230228/kakao.png')} style={{width:22,height:20,resizemode:'contain',marginRight:20}}/>
                             <Text style={styles.kakaoTextStyle}>Login with Kakao</Text>
                         </TouchableOpacity>
                         <Text style={styles.registerTextStyle} onPress={ tosignInScreen}>

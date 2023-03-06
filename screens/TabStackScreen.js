@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useState } from 'react';
-import { View,Text } from 'react-native';
+import { View,Text,Button } from 'react-native';
 import DetailScreen from './DetailScreen';
 import HomeScreen from './HomeScreen';
 import SettingScreen from './SettingScreen';
@@ -10,6 +10,7 @@ import LoginScreen from './LoginScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SignInScreen from './SignInScreen';
 import FirstsetScreen from './FirstsetScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 Ionicons.loadFont()
 
 const TabStack = createBottomTabNavigator();
@@ -34,7 +35,15 @@ const HomeStackScreen=()=>{
 const DetailStackScreen=()=>{
     return(
         <DetailStack.Navigator>
-            <DetailStack.Screen name='Detail' component={DetailScreen} options={{headerShown:true}}/>
+            <DetailStack.Screen name='Detail' component={DetailScreen} options={{headerShown:true,
+             headerRight: () => (
+                <Button
+                  onPress={() => alert('This is a button!')}
+                  title="Info"
+                  color="#fff"
+                />
+              ),
+            }}/>
         </DetailStack.Navigator>
     )
 }
@@ -91,6 +100,11 @@ const TabStackScreen = () =>{
     );
 }
     const AppStackScreen = () => {
+        const [isSignin,setIssignin] = useState(false);
+        // AsyncStorage.getItem('login', (err, result) => {
+        //     console.log(JSON.parse(result)); // User1 출력
+        //     setIssignin(JSON.parse(result))
+        //   });
         return(
             <AppStack.Navigator>
                 <AppStack.Screen name={'Log'} component={LoginStackScreen} options={{headerShown:false}}/>

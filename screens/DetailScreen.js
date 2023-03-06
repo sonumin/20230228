@@ -1,15 +1,14 @@
 import React, { useState ,useEffect} from 'react';
-import { View,Text, StyleSheet, Button, ActionSheetIOS, Image, Pressable,Alert } from 'react-native';
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { View,Text, StyleSheet, ActionSheetIOS, Image, Pressable,Alert,Dimensions } from 'react-native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import SelectDropdown from 'react-native-select-dropdown';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 Ionicons.loadFont()
-
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 const DetailScreen = () =>{
     const result = [];
     const foodList = [
@@ -22,8 +21,9 @@ const DetailScreen = () =>{
     '4',
     '5',
     ];
-    const navigation = useNavigation();
+    const [reload,setReload] = useState(false);
     const [foodImg, setFoodImg] = useState();
+    const [maxlength, setMaxlength] = useState(0);
     const [foodData, setFoodData] = useState();
     const [jsonData, setJsonData] = useState();
     const [visible, setVisible] = useState(false);
@@ -57,13 +57,13 @@ const DetailScreen = () =>{
             responseType: 'json'
         })
         .then((res) => {
-            // const arr = []
             for(let i = 0; i < res.data.length - 1; i++){
                 arr.push( res.data[i+1])
             }
             setJsonData(res.data)
             setFoodImg(`data:image/jpeg;base64,${res.data[0].image_data}`)
             setFoodData(arr)
+            setMaxlength(res.data.length-2)
             setVisible(true)
             console.log(arr)
         })
@@ -79,10 +79,10 @@ const DetailScreen = () =>{
           },
           responseType: 'json'
         })
+        Alert.alert('전송 와카리마셍')
     }
     const showFoodList = () =>{
         
-        // const result = [];
         if(visible){
             for (let i = 0; i < foodData.length; i++){
             result.push(
@@ -103,7 +103,7 @@ const DetailScreen = () =>{
                         buttonStyle={styles.dropdown2BtnStyle}
                         buttonTextStyle={styles.dropdown2BtnTxtStyle}
                         renderDropdownIcon={isOpened => {
-                            return <Ionicons name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#000'} size={10} />;
+                            return <Ionicons name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#000'} size={12} />;
                         }}
                         dropdownIconPosition={'right'}
                         dropdownStyle={styles.dropdown2DropdownStyle}
@@ -115,15 +115,13 @@ const DetailScreen = () =>{
                         searchPlaceHolder={'Search here'}
                         searchPlaceHolderColor={'#F8F8F8'}
                         renderSearchInputLeftIcon={() => {
-                            return <Ionicons name={'search'} color={'#000'} size={18} />;
+                            return <Ionicons name={'search'} color={'#000'} size={16} />;
                         }}
                     />
                     <Text style={{fontSize:15,marginLeft:'5%'}}>양 :</Text>
                     <SelectDropdown
         
                     data={foodamount}
-                    // defaultValueByIndex={1}
-                    // defaultValue={'England'}
                     onSelect={(selectedItem) => {
                         foodData[i].amount=selectedItem
                     }}
@@ -137,7 +135,7 @@ const DetailScreen = () =>{
                     buttonStyle={styles.dropdown3BtnStyle}
                     buttonTextStyle={styles.dropdown2BtnTxtStyle}
                     renderDropdownIcon={isOpened => {
-                        return <Ionicons name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#000'} size={10} />;
+                        return <Ionicons name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#000'} size={12} />;
                     }}
                     dropdownIconPosition={'right'}
                     dropdownStyle={styles.dropdown2DropdownStyle}
@@ -148,7 +146,7 @@ const DetailScreen = () =>{
                     searchPlaceHolder={'Search here'}
                     searchPlaceHolderColor={'#F8F8F8'}
                     renderSearchInputLeftIcon={() => {
-                        return <Ionicons name={'search'} color={'#000'} size={18} />;
+                        return <Ionicons name={'search'} color={'#000'} size={16} />;
                     }}
                     />
               </View>)
@@ -157,17 +155,24 @@ const DetailScreen = () =>{
         return result
       }
     const plusfood = () =>{
-        let data1 = {amount:1,name:2}
+        let data1 = {amount:1,name:'추가음식'}
         arr=foodData
         arr.push(data1)
         setFoodData(arr)
-        console.log(data1)
-        // setVisible(false)
+        console.log(maxlength)
+        setReload(true)
     }
         useEffect(()=>{
-            showFoodList
-        },[foodData])
-    
+            setReload(false)
+        },[reload])
+    const deletefood = () =>{
+        if(maxlength==foodData.length)
+        return(
+            Alert.alert('더이상 감소 할 수 없어여!!')
+        )
+        foodData.pop()
+        setReload(true)
+    }
     const actionSheet = () =>{
         ActionSheetIOS.showActionSheetWithOptions(
             {
@@ -183,10 +188,7 @@ const DetailScreen = () =>{
             },
         )
     }
-    // useEffect(()=>{
-    //     // setVisible(true)
-    //     // showFoodList
-    // })
+    
     return(
         <View style={styles.screen}>
             <View style={styles.imageContainer}>
@@ -198,13 +200,15 @@ const DetailScreen = () =>{
                 </View>
             </View>
             <View style={styles.twobutton}>
-                    <TouchableOpacity><Ionicons name={'add'} color={'gray'} size={24} /></TouchableOpacity>
-                    <TouchableOpacity><Ionicons name={'ios-remove-outline'} color={'gray'} size={24} /></TouchableOpacity>
+                    <TouchableOpacity onPress={plusfood}><Ionicons name={'add'} color={'gray'} size={24} /></TouchableOpacity>
+                    <TouchableOpacity onPress={deletefood}><Ionicons name={'ios-remove-outline'} color={'gray'} size={24} /></TouchableOpacity>
             </View>
             <View style={styles.labelContainer}>
-                {visible && <View style={styles.labelContainer2}>
+                {visible && <ScrollView style={styles.scrollview}contentContainerStyle={{
+                    alignItems:'center'
+                }}>
                 {showFoodList()}
-            </View>}
+            </ScrollView>}
             </View>
             <View style={styles.buttonContainer}>
                 <Pressable style={styles.button} onPress={actionSheet}>
@@ -216,9 +220,6 @@ const DetailScreen = () =>{
                 <Pressable style={styles.button} onPress={saveResult}>
                     <Icon name="save" size={24} color="#ffffff" />
                 </Pressable>
-                {/* <Pressable style={styles.button} onPress={aa}>
-                    <Icon name="save" size={24} color="#ffffff" />
-                </Pressable> */}
             </View>
         </View>
     )
@@ -264,7 +265,7 @@ const styles=StyleSheet.create({
     textBox:{
         borderColor: "gray",
         width: "90%",
-        height:'35%',
+        height:windowHeight*0.035,
         borderWidth: 1,
         borderRadius: 10,
         marginTop:'3%',
@@ -273,13 +274,13 @@ const styles=StyleSheet.create({
       },
     labelContainer: {
         width: '100%',
-        height:"35%",
-        alignItems:'center',
+        height:"40%",
+        alignItems:'center'
     },
-    labelContainer2: {
-        width: '100%',
-        height:"35%",
-        alignItems:'center',
+    scrollview:{
+        width:'100%',
+        // backgroundColor:'green',
+        // alignItems:'center'
     },
     buttonContainer: {
         width: '92%',
@@ -330,11 +331,11 @@ const styles=StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 12,
       },
-      dropdown2RowStyle: {backgroundColor: '#fff', borderBottomColor: '#C5C5C5'},
+      dropdown2RowStyle: {backgroundColor: '#fff',height:30, borderBottomColor: '#C5C5C5'},
       dropdown2RowTxtStyle: {
         color: '#000',
         textAlign: 'center',
-        fontWeight: 'bold',
+        // fontWeight: 'bold',
       },
       dropdown2SelectedRowStyle: {backgroundColor: 'rgba(255,255,255,0.2)'},
       dropdown2searchInputStyleStyle: {

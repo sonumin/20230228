@@ -63,7 +63,7 @@ const SignInScreen = () => {
                     <KeyboardAvoidingView enabled>
                         <View style={{alignItems: 'center'}}>
                             <Image
-                                source={require('/Users/haesu/Desktop/rrrrrrr/RN_food/egg-bread.png')}
+                                source={require('/Users/haesu/Desktop/capston_food/20230228/egg-bread.png')}
                                 style={{
                                     width: '50%',
                                     height: 100,
